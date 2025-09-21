@@ -7,7 +7,6 @@ import Link from "next/link";
 import {useRouter  }  from 'next/navigation';
 import { AppDispatch } from "@/app/store/store";
 import { loginUser } from "@/app/features/auth/authThunk"
-import {RootState} from "@/app/store/store"
 import { tokenSelector } from "@/app/features/auth/authSelectors";
 
 interface form {
@@ -16,7 +15,6 @@ interface form {
 }
 
 export default function LoginPage() {
- 
   const [formData, setFormData] = useState<form>({
     email: null,
     password: null,

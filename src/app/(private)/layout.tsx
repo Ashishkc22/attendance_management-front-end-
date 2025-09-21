@@ -2,7 +2,7 @@ import Sidebar from "@/components/Sidebar";
 import RouteProtector from "./RouteProtector";
 import { Inter } from 'next/font/google'
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ['latin'],variable: '--font-inter', })
 
 export const metadata = {
   title: "Dashboard",
@@ -16,7 +16,7 @@ export default function PrivateLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.className} bg-white dark:bg-black text-black dark:text-white`}
+        className={`bg-white dark:bg-black text-black dark:text-white`}
       >
         <RouteProtector>
           <div className="flex min-h-screen relative">

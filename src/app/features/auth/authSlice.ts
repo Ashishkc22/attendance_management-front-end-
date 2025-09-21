@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { loginUser,getAccesstoken } from "./authThunk";
+import { loginUser,getAccesstoken,resetPassword } from "./authThunk";
 
 interface AuthState {
   token: string | null;
@@ -31,6 +31,10 @@ const authSlice = createSlice({
         console.log("Login failed");
       }).addCase(getAccesstoken.fulfilled,(state, action)=>{
         state.token = action.payload.data.accessToken;
+      }).addCase(resetPassword.rejected,()=>{
+        console.log("password reset failed failed.");
+      }).addCase(resetPassword.fulfilled,(state, action)=>{
+        console.log("password reset successful.");
       });
   },
 });

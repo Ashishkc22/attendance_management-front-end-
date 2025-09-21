@@ -27,6 +27,7 @@ import {
   usersSelector
 } from "@/app/features/userManagement/userSelectors";
 import { useSelector,useDispatch } from "react-redux";
+import { AppDispatch } from "@/app/store/store";
 
 type User = {
   id: number;
@@ -77,7 +78,7 @@ const mockUsers: User[] = [
 export default function UsersPage() {
   const [search, setSearch] = useState("");
   const usersState = useSelector(usersSelector);
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<AppDispatch>()
   const [statusFilter, setStatusFilter] = useState("All");
 
   const filteredUsers = useMemo(() => {

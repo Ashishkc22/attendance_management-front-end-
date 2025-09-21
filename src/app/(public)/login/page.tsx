@@ -23,7 +23,7 @@ export default function LoginPage() {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
 
-  const handleSubmit = async (e:React.ChangeEvent) => {
+  const handleSubmit = async (e:React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     if(formData.email && formData.password ){
       const result = await dispatch(loginUser({ email:formData.email, password:formData.password }));

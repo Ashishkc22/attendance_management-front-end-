@@ -17,17 +17,17 @@ function getToken(): string | undefined {
   return undefined;
 }
 
-function getAxiosBase({ url }: { url: keyof UrlMapper }): AxiosInstance {
+function getAxiosBase({ url,token }: { url: keyof UrlMapper,token?: string }): AxiosInstance {
   const apiUrl = urlMapper[url];
   if (!apiUrl) {
     console.error("API base URL is not defined in the environment variables.");
     throw new Error("apiUrl not found");
   }
-  const token = getToken();
+  const authToken = getToken() || token;
   return axios.create({
     baseURL: apiUrl,
     headers: {
-      ...(token && { Authorization: `Bearer ${token}` }),
+      ...(token && { Authorization: `Bearer ${authToken}` }),
       "Content-Type": "application/json",
     },
   });

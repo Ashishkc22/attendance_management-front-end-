@@ -23,10 +23,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { NewUserDrawer } from "./new-user-drawer";
-import {
-  usersSelector
-} from "@/app/features/userManagement/userSelectors";
-import { useSelector,useDispatch } from "react-redux";
+import { usersSelector } from "@/app/features/userManagement/userSelectors";
+import { useSelector, useDispatch } from "react-redux";
+import { AppDispatch } from "@/app/store/store";
 
 type User = {
   id: number;
@@ -77,7 +76,7 @@ const mockUsers: User[] = [
 export default function UsersPage() {
   const [search, setSearch] = useState("");
   const usersState = useSelector(usersSelector);
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<AppDispatch>();
   const [statusFilter, setStatusFilter] = useState("All");
 
   const filteredUsers = useMemo(() => {
@@ -97,9 +96,9 @@ export default function UsersPage() {
     console.log(`Invited user: ${email}`);
   };
 
-  useEffect(()=>{
-    dispatch(fetchUsers())
-  },[])
+  useEffect(() => {
+    dispatch(fetchUsers());
+  }, []);
 
   return (
     <div className="p-6 space-y-6">
@@ -107,7 +106,10 @@ export default function UsersPage() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <h1 className="text-2xl font-semibold">User Management</h1>
         <NewUserDrawer>
-          <Button><UserPlus />Invite User</Button>
+          <Button>
+            <UserPlus />
+            Invite User
+          </Button>
         </NewUserDrawer>
       </div>
 
@@ -151,12 +153,10 @@ export default function UsersPage() {
             {usersState?.data?.map((user) => (
               <TableRow key={user.id}>
                 <TableCell>{user.name}</TableCell>
-                <TableCell>{user.email}</TableCell> 
+                <TableCell>{user.email}</TableCell>
                 <TableCell>{user.role}</TableCell>
                 <TableCell>{user.status}</TableCell>
-                <TableCell className="text-right">
-                    {user.createdAt}
-                </TableCell>
+                <TableCell className="text-right">{user.createdAt}</TableCell>
               </TableRow>
             ))}
             {filteredUsers.length === 0 && (

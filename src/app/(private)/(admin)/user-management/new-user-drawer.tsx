@@ -24,13 +24,10 @@ import { UserPlus, Loader2Icon } from "lucide-react";
 import { AppDispatch } from "@/app/store/store";
 import {
   inviteUser as inviteUserSelector,
-  classDateSelector,
   department,
-  usersSelector
 } from "@/app/features/userManagement/userSelectors";
 import {
   inviteUser,
-  fetchClasses,
   fetchDepartments,
 } from "@/app/features/userManagement/userThunk";
 import { InviteUserPayload } from "@/app/features/userManagement/userTypes";
@@ -51,7 +48,6 @@ export function NewUserDrawer({ children }: NewUserDrawerProps) {
     middle_name: "",
     last_name: "",
     email: "",
-    shift: "",
     departmentId: "",
     role: "TEACHER",
   });
@@ -67,14 +63,14 @@ export function NewUserDrawer({ children }: NewUserDrawerProps) {
   useEffect(() => {
     setHasMounted(true);
     dispatch(fetchDepartments());
-  }, []);
+  }, [dispatch]);
 
   if (!hasMounted) return null;
 
   return (
     <Drawer>
       <DrawerTrigger asChild>{children}</DrawerTrigger>
-      <DrawerContent className="p-6 max-w-md ml-auto mr-0 w-full h-fit">
+      <DrawerContent className="p-6 max-w-md ml-auto mr-0 w-full h-full">
         <VisuallyHidden>
           <DrawerTitle>Hidden Title</DrawerTitle>
         </VisuallyHidden>
@@ -140,7 +136,7 @@ export function NewUserDrawer({ children }: NewUserDrawerProps) {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="TEACHER">Teacher</SelectItem>
-              <SelectItem value="STUDENT">Student</SelectItem>
+              {/* <SelectItem value="STUDENT">Student</SelectItem> */}
             </SelectContent>
           </Select>
         </div>

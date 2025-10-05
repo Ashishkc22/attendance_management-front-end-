@@ -146,7 +146,10 @@ export interface AddStudentPayload {
 }
 
 export interface ClassAndStudentCountState {
-data: Array<Object>;
+data: Array<{
+  id: string,
+  name: string
+}>;
 loading: boolean;
 error: string | null;
 }

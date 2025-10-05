@@ -8,7 +8,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import axios from "@/lib/axios"; // Your axios instance here
+import axios from "axios"; // Your axios instance here
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import DepartmentClasses from "./DepartmentClasses"; // Adjust path as needed

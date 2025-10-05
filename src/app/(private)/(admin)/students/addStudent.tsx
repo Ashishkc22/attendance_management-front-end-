@@ -19,6 +19,7 @@ import {
 } from "@/app/features/userManagement/userThunk";
 import { AppDispatch } from "@/app/store/store";
 import { classDateSelector } from "@/app/features/userManagement/userSelectors";
+import { AddStudentPayload } from "@/app/features/userManagement/userTypes";
 
 type formState = {
   first_name: string;
@@ -27,7 +28,7 @@ type formState = {
   email: string;
   departmentId: string;
   shift: string;
-  classIds: Array<{ id?: string }>; // because your example has [{}], an empty object is possible
+  classIds?: Array<{ id?: string }>; // because your example has [{}], an empty object is possible
 };
 
 export default function AddStudentForm({
@@ -42,7 +43,7 @@ export default function AddStudentForm({
 
   const classList = useSelector(classDateSelector);
 
-  const [form, setForm] = React.useState<formState>({
+  const [form, setForm] = React.useState<AddStudentPayload>({
     first_name: "",
     middle_name: "",
     last_name: "",

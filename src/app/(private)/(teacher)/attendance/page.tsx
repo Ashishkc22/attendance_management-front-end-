@@ -47,7 +47,7 @@ const AttendancePage: React.FC = () => {
     data: classList = [],
     loading: classesLoading,
     error: classesError,
-  } = useSelector(selectClassListWithStudentCount);
+  } = useSelector(selectClassListWithStudentCount) || {};
   const students = useSelector(selectStudentAttendance);
 
   const [selectedClass, setSelectedClass] = useState<string | null>(null);

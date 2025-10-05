@@ -14,6 +14,11 @@ interface form {
   password: string | null;
 }
 
+const redirectRoutes = {
+  "TEACHER":"students",
+  "ADMIN": "user-management"
+}
+
 export default function LoginPage() {
   const [formData, setFormData] = useState<form>({
     email: null,
@@ -32,7 +37,7 @@ export default function LoginPage() {
       if (loginUser.fulfilled.match(result)) {
         localStorage.setItem("refreshToken", result.payload.data.refreshToken);
         localStorage.setItem("accessToken", result.payload.data.accessToken);
-        router.push("/");
+        router.push(redirectRoutes[result.payload.data.role as keyof typeof redirectRoutes]);
       }
     }
   };

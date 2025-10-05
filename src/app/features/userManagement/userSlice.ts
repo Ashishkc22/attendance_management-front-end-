@@ -1,8 +1,30 @@
 // redux/user/userSlice.ts
 
-import { createSlice } from "@reduxjs/toolkit";
-import { inviteUser, fetchClasses,fetchDepartments,fetchUsers,userDetails, fetchStudents } from "./userThunk";
-import { InviteUserState, ClassState,DepartmentsState,UsersState,userDetailsType, Student } from "./userTypes";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import {
+  inviteUser,
+  fetchClasses,
+  fetchDepartments,
+  fetchUsers,
+  userDetails,
+  fetchStudents,
+  addDepartment,
+  addClass,
+  getClassAndStudentCount,
+  getStudentsAttendance,
+  markStudentAttendance,
+} from "./userThunk";
+import {
+  InviteUserState,
+  ClassState,
+  DepartmentsState,
+  UsersState,
+  userDetailsType,
+  Student,
+  ClassAndStudentCountState,
+  AttendanceState,
+  AttendancePayload,
+} from "./userTypes";
 
 interface StudentsState {
   data: Student[];
@@ -17,6 +39,8 @@ interface UserState {
   users: UsersState;
   userDetails: userDetailsType;
   students: StudentsState;
+  classAndStudentCount: ClassAndStudentCountState;
+  attendance: AttendanceState;
 }
 
 const initialState: UserState = {
@@ -29,12 +53,12 @@ const initialState: UserState = {
   department: {
     data: [],
     loading: false,
-    error: ""
+    error: "",
   },
   users: {
     data: [],
     loading: false,
-    error: ""
+    error: "",
   },
   userDetails: {
     data: {
@@ -51,17 +75,36 @@ const initialState: UserState = {
       updatedAt: "",
       departmentId: null,
       classId: null,
-      userId: ""
+      userId: "",
     },
     loading: false,
-    error: ""
+    error: "",
   },
   students: {
     data: [],
     loading: false,
-    error: null
-  }
+    error: null,
+  },
+  classAndStudentCount: {
+    loading: false,
+    error: null,
+    data: [],
+  },
+  attendance: {
+    loading: false,
+    error: null,
+    data: [],
+  },
 };
+
+interface UserManagementState {
+  classList: {
+    data: Array<{ id: string; name: string; studentCount: number }>;
+    loading: boolean;
+    error: string | null;
+  };
+  students: Student[];
+}
 
 export const userSlice = createSlice({
   name: "user",
@@ -70,6 +113,32 @@ export const userSlice = createSlice({
     clearUserMessages(state) {
       state.inviteUser.error = null;
       state.inviteUser.successMessage = null;
+    },
+    toggleStudentAttendance: (
+      state,
+      action: PayloadAction<{ studentId: string; isPresent: boolean }>
+    ) => {
+      const { studentId, isPresent } = action.payload;
+      state.attendance.data = state.attendance.data.map((student) => {
+        if (student.id === studentId) {
+          if (!student.attendance) student.attendance = { status: "" };
+          student.attendance.status = isPresent ? "Present" : "Absent";
+        }
+        return student;
+      });
+    },
+    markAllStudents: (state, action: PayloadAction<{ isPresent: boolean }>) => {
+      const { isPresent } = action.payload;
+      state.attendance.data = state.attendance.data.map((student) => {
+        if (!student.attendance) {
+          student.attendance = {
+            status: isPresent ? "Present" : "Absent",
+          };
+        } else {
+          student.attendance.status = isPresent ? "Present" : "Absent";
+        }
+        return student;
+      });
     },
   },
   extraReducers: (builder) => {
@@ -137,7 +206,6 @@ export const userSlice = createSlice({
         state.userDetails.loading = false;
         state.userDetails.error = action.payload as string;
       })
-      // --- Students Thunk ---
       .addCase(fetchStudents.pending, (state) => {
         state.students.loading = true;
         state.students.error = null;
@@ -146,23 +214,42 @@ export const userSlice = createSlice({
         state.students.loading = false;
         state.students.data = action.payload;
       })
-      .addCase(fetchStudents.rejected, (state, action) => {
-        state.students.loading = false;
-        state.students.error = action.payload?.error || "Failed to fetch students";
+      .addCase(addDepartment.pending, (state) => {})
+      .addCase(addDepartment.fulfilled, (state, action) => {})
+      .addCase(addDepartment.rejected, (state, action) => {})
+      .addCase(addClass.rejected, (state, action) => {})
+      .addCase(addClass.fulfilled, (state, action) => {})
+      .addCase(getClassAndStudentCount.pending, (state) => {
+        state.classAndStudentCount.loading = true;
       })
-      // --- Add Student Thunk ---
-      .addCase(require('./userThunk').addStudent.pending, (state) => {
-       
+      .addCase(getClassAndStudentCount.fulfilled, (state, action) => {
+        state.classAndStudentCount.loading = false;
+        state.classAndStudentCount.data = action.payload;
       })
-      .addCase(require('./userThunk').addStudent.fulfilled, (state, action) => {
-       
+      .addCase(getClassAndStudentCount.rejected, (state, action) => {
+        state.classAndStudentCount.loading = false;
+        state.classAndStudentCount.error = action.error as string;
       })
-      .addCase(require('./userThunk').addStudent.rejected, (state, action) => {
-       
-      });
-
+      .addCase(getStudentsAttendance.pending, (state, action) => {
+        state.attendance.loading = true;
+          state.classAndStudentCount.error = null;
+      })
+      .addCase(getStudentsAttendance.fulfilled, (state, action) => {
+        state.attendance.loading = false;
+        state.attendance.error = null;
+        state.attendance.data = action.payload;
+      })
+      .addCase(getStudentsAttendance.rejected, (state, action) => {
+        state.attendance.loading = false;
+        state.attendance.error = action.payload?.error as string;
+        state.attendance.data = [];
+      })
+      .addCase(markStudentAttendance.pending, (state) => {})
+      .addCase(markStudentAttendance.fulfilled, (state) => {})
+      .addCase(markStudentAttendance.rejected, (state, action) => {});
   },
 });
 
-export const { clearUserMessages } = userSlice.actions;
+export const { clearUserMessages, toggleStudentAttendance, markAllStudents } =
+  userSlice.actions;
 export default userSlice.reducer;

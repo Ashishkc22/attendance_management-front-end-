@@ -7,6 +7,8 @@ import {
   LogOut,
   LayoutDashboard,
   Users,
+  Pen,
+  PcCase
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -23,13 +25,28 @@ const adminNav = [
       label: "User Management",
       href: "/user-management",
       icon: <Users size={20} />,
-    }
+    },
+    {
+      label: "Departments",
+      href: "/departments",
+      icon: <Users size={20} />,
+    },
 ]
 const teacherNav = [
   {
       label: "student",
       href: "/students",
       icon: <Users size={20} />,
+    },
+    {
+      label: "class",
+      href: "/class",
+      icon: <PcCase size={20} />,
+    },
+    {
+      label: "attendance",
+      href: "/attendance",
+      icon: <Pen size={20} />,
     }
 ]
 
@@ -133,13 +150,13 @@ export default function Sidebar() {
 
       {/* Bottom Buttons */}
       <div className="p-2 space-y-1 border-t dark:border-gray-800">
-        <SidebarItem
+        {/* <SidebarItem
           icon={<Settings size={20} />}
           label="Settings"
           href="/settings"
           collapsed={collapsed}
           active={pathname === "/settings"}
-        />
+        /> */}
         <SidebarItem
           icon={<LogOut size={20} />}
           label="Logout"

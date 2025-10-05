@@ -19,7 +19,7 @@ export default function StudentListPage() {
     error,
   } = useSelector((state: any) => state.user.students);
   const [showForm, setShowForm] = React.useState(false);
-  const [deleteDialog, setDeleteDialog] = React.useState<{ open: boolean; studentId: string | null }>({ open: false, studentId: null });
+  const [deleteDialog, setDeleteDialog] = React.useState<{ open: boolean; email: string | null }>({ open: false, email: null });
 
   useEffect(() => {
     dispatch(fetchStudents());
@@ -107,7 +107,7 @@ export default function StudentListPage() {
                     <Button
                       variant="destructive"
                       size="sm"
-                      onClick={() => setDeleteDialog({ open: true, studentId: student.id })}
+                      onClick={() => setDeleteDialog({ open: true, email: student.email })}
                     >
                       Delete
                     </Button>
@@ -125,15 +125,15 @@ export default function StudentListPage() {
             <h2 className="text-lg font-semibold mb-4">Confirm Delete</h2>
             <p className="mb-6">Are you sure you want to delete this student?</p>
             <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setDeleteDialog({ open: false, studentId: null })}>Cancel</Button>
+              <Button variant="outline" onClick={() => setDeleteDialog({ open: false, email: null })}>Cancel</Button>
               <Button
                 variant="destructive"
                 onClick={async () => {
-                  if (deleteDialog.studentId) {
-                    await dispatch(deleteStudent(deleteDialog.studentId));
+                  if (deleteDialog.email) {
+                    await dispatch(deleteStudent(deleteDialog.email));
                     dispatch(fetchStudents());
                   }
-                  setDeleteDialog({ open: false, studentId: null });
+                  setDeleteDialog({ open: false, email: null });
                 }}
               >
                 Delete

@@ -22,7 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { NewUserDrawer } from "./new-user-drawer";
+import { NewUserDialog } from "./new-user-drawer";
 import { usersSelector } from "@/app/features/userManagement/userSelectors";
 import { useSelector, useDispatch } from "react-redux";
 import { AppDispatch } from "@/app/store/store";
@@ -75,6 +75,7 @@ const mockUsers: User[] = [
 
 export default function UsersPage() {
   const [search, setSearch] = useState("");
+  const [isDrawerOpen,setDrawer] = useState(false)
   const usersState = useSelector(usersSelector);
   const dispatch = useDispatch<AppDispatch>();
   const [statusFilter, setStatusFilter] = useState("All");
@@ -101,16 +102,16 @@ export default function UsersPage() {
   }, []);
 
   return (
-    <div className="p-6 space-y-6">
+    <div>
+      {isDrawerOpen &&<NewUserDialog isOpen={isDrawerOpen} handleDialogClose={()=> setDrawer(false)}/>}
+      <div className="p-6 space-y-6">
       {/* Top section */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <h1 className="text-2xl font-semibold">User Management</h1>
-        <NewUserDrawer>
-          <Button>
+        <Button onClick={()=> setDrawer(!isDrawerOpen)}>
             <UserPlus />
             Invite User
           </Button>
-        </NewUserDrawer>
       </div>
 
       {/* Filters */}
@@ -168,6 +169,7 @@ export default function UsersPage() {
             )}
           </TableBody>
         </Table>
+      </div>
       </div>
     </div>
   );

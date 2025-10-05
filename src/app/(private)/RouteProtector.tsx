@@ -20,10 +20,13 @@ export default function RouteProtector({
       router.push("/login");
     } else {
       dispatch(userDetails()).then((d) => {
+        console.log("user deatils error",d)
         if (d?.payload?.message == "Invalid or expired token") {
           localStorage.removeItem("accessToken");
           router.push("/login");
         }
+      }).catch(e=>{
+        console.log("e",e)
       });
     }
     setToken(_token);

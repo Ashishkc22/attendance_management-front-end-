@@ -1,12 +1,12 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { loginCredentials,resetPasswordPayload,resetPasswordResponse } from "./authTypes";
-import { AxiosResponse } from "axios";
 import getAxiosBase from "@/lib/axios";
 
 interface loginResponse {
   data: {
     accessToken: string;
     refreshToken: string;
+    role: string
   };
 }
 

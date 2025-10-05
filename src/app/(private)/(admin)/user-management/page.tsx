@@ -22,11 +22,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { NewUserDrawer } from "./new-user-drawer";
-import {
-  usersSelector
-} from "@/app/features/userManagement/userSelectors";
-import { useSelector,useDispatch } from "react-redux";
+import { NewUserDialog } from "./new-user-drawer";
+import { usersSelector } from "@/app/features/userManagement/userSelectors";
+import { useSelector, useDispatch } from "react-redux";
 import { AppDispatch } from "@/app/store/store";
 
 type User = {
@@ -77,8 +75,9 @@ const mockUsers: User[] = [
 
 export default function UsersPage() {
   const [search, setSearch] = useState("");
+  const [isDrawerOpen,setDrawer] = useState(false)
   const usersState = useSelector(usersSelector);
-  const dispatch = useDispatch<AppDispatch>()
+  const dispatch = useDispatch<AppDispatch>();
   const [statusFilter, setStatusFilter] = useState("All");
 
   const filteredUsers = useMemo(() => {
@@ -98,18 +97,21 @@ export default function UsersPage() {
     console.log(`Invited user: ${email}`);
   };
 
-  useEffect(()=>{
-    dispatch(fetchUsers())
-  },[])
+  useEffect(() => {
+    dispatch(fetchUsers());
+  }, []);
 
   return (
-    <div className="p-6 space-y-6">
+    <div>
+      {isDrawerOpen &&<NewUserDialog isOpen={isDrawerOpen} handleDialogClose={()=> setDrawer(false)}/>}
+      <div className="p-6 space-y-6">
       {/* Top section */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <h1 className="text-2xl font-semibold">User Management</h1>
-        <NewUserDrawer>
-          <Button><UserPlus />Invite User</Button>
-        </NewUserDrawer>
+        <Button onClick={()=> setDrawer(!isDrawerOpen)}>
+            <UserPlus />
+            Invite User
+          </Button>
       </div>
 
       {/* Filters */}
@@ -152,12 +154,10 @@ export default function UsersPage() {
             {usersState?.data?.map((user) => (
               <TableRow key={user.id}>
                 <TableCell>{user.name}</TableCell>
-                <TableCell>{user.email}</TableCell> 
+                <TableCell>{user.email}</TableCell>
                 <TableCell>{user.role}</TableCell>
                 <TableCell>{user.status}</TableCell>
-                <TableCell className="text-right">
-                    {user.createdAt}
-                </TableCell>
+                <TableCell className="text-right">{user.createdAt}</TableCell>
               </TableRow>
             ))}
             {filteredUsers.length === 0 && (
@@ -169,6 +169,7 @@ export default function UsersPage() {
             )}
           </TableBody>
         </Table>
+      </div>
       </div>
     </div>
   );

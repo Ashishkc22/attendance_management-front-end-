@@ -12,10 +12,12 @@ export interface ClassState {
   data: Array<{
     id: string;
     name: string;
+    updatedAt: string;
+    departmentId: string;
+    createdAt: string
   }>;
 }
 
-export type UserRole = "STUDENT" | "TEACHER";
 
 export interface InviteUserPayload {
   first_name: string;
@@ -24,7 +26,10 @@ export interface InviteUserPayload {
   email: string;
   shift?: string;
   departmentId: string;
-  role: UserRole;
+  role: string;
+  classIds?: Array<{
+    id: string
+  }>
 }
 
 export interface InviteUserResponse {
@@ -135,5 +140,39 @@ export interface AddStudentPayload {
   email: string;
   departmentId: string;
   shift?: string;
-  classId?: string;
+  classIds?: Array<{
+    id: string
+  }>;
+}
+
+export interface ClassAndStudentCountState {
+data: Array<{
+  id: string,
+  name: string
+}>;
+loading: boolean;
+error: string | null;
+}
+
+export interface AttendanceStudents {
+    attendance: { status: string } | null;
+    email: string;
+    first_name: string;
+    last_name: string;
+    id: string;
+  }
+
+export interface AttendanceState {
+  data: Array<AttendanceStudents>;
+  loading: boolean;
+  error: string | null;
+}
+
+// types.ts (or wherever appropriate)
+export interface AttendancePayload {
+  date: string; // e.g., '2023-10-04'
+  students: {
+    userId: string;
+    status: string;
+  }[];
 }

@@ -1,5 +1,5 @@
 import { RootState } from "@/app/store/store";
-import { InviteUserState,ClassState,DepartmentsState,UsersState,userDetailsType } from "./userTypes";
+import { InviteUserState,ClassState,DepartmentsState,UsersState,userDetailsType, ClassAndStudentCountState } from "./userTypes";
 
 export const inviteUser = (state: RootState): InviteUserState | null =>
   state.user.inviteUser;
@@ -15,3 +15,7 @@ export const usersSelector = (state: RootState): UsersState | null =>
 
 export const userDetailsSelector = (state: RootState): userDetailsType | null =>
   state.user.userDetails;
+
+export const selectClassListWithStudentCount = (state: RootState):ClassAndStudentCountState | null => state.user.classAndStudentCount;
+
+export const selectStudentAttendance = (state: RootState) => state.user.attendance

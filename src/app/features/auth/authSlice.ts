@@ -3,10 +3,12 @@ import { loginUser,getAccesstoken,resetPassword } from "./authThunk";
 
 interface AuthState {
   token: string | null;
+  userRole: string | null;
 }
 
 const initialState: AuthState = {
   token: null,
+  userRole: null
 };
 
 const authSlice = createSlice({
@@ -25,8 +27,8 @@ const authSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         console.log("action", action);
         state.token = action.payload.data.accessToken;
-        localStorage.setItem("refreshToken",action.payload.data.refreshToken) 
-        localStorage.setItem("accessToken",action.payload.data.accessToken) 
+        state.userRole= action.payload.data.role;
+       
       }).addCase(getAccesstoken.rejected,()=>{
         console.log("Login failed");
       }).addCase(getAccesstoken.fulfilled,(state, action)=>{

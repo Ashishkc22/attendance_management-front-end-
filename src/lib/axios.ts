@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from "axios";
+import axios, { AxiosInstance, InternalAxiosRequestConfig } from "axios";
 
 type UrlMapper = {
   auth: string | undefined;
@@ -23,14 +23,22 @@ function getAxiosBase({ url }: { url: keyof UrlMapper }): AxiosInstance {
     console.error("API base URL is not defined in the environment variables.");
     throw new Error("apiUrl not found");
   }
-  const token = getToken();
-  return axios.create({
+  const axiosInstance =  axios.create({
     baseURL: apiUrl,
     headers: {
-      ...(token && { Authorization: `Bearer ${token}` }),
       "Content-Type": "application/json",
     },
   });
+  axiosInstance.interceptors.request.use(requestInterceptor,(err)=>Promise.reject(err));
+  return axiosInstance
+}
+
+function requestInterceptor(config: InternalAxiosRequestConfig) {
+  const authToken = getToken();
+  if (authToken) {
+    config.headers.Authorization = `Bearer ${authToken}`;
+  }
+  return config;
 }
 
 export default getAxiosBase;

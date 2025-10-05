@@ -3,13 +3,13 @@
 import { useState, useEffect } from "react";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import {
-  Drawer,
-  DrawerContent,
-  DrawerFooter,
-  DrawerClose,
-  DrawerTrigger,
-  DrawerTitle,
-} from "@/components/ui/drawer";
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogClose,
+  DialogTrigger,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,61 +24,84 @@ import { UserPlus, Loader2Icon } from "lucide-react";
 import { AppDispatch } from "@/app/store/store";
 import {
   inviteUser as inviteUserSelector,
-  classDateSelector,
   department,
-  usersSelector
+  classDateSelector,
 } from "@/app/features/userManagement/userSelectors";
 import {
   inviteUser,
-  fetchClasses,
   fetchDepartments,
+  fetchClasses,
 } from "@/app/features/userManagement/userThunk";
-import { InviteUserPayload } from "@/app/features/userManagement/userTypes";
+import { ClassState } from "@/app/features/userManagement/userTypes";
 
-interface NewUserDrawerProps {
-  children: React.ReactNode; // For trigger (like a button)
+interface InviteUserPayload {
+  first_name: string;
+  middle_name: string;
+  last_name: string;
+  email: string;
+  departmentId: string;
+  role: string;
+  shift?: string;
+  classIds?: Array<{
+    id: string;
+  }>;
 }
 
-export function NewUserDrawer({ children }: NewUserDrawerProps) {
+interface NewUserDialogProps {
+  isOpen: boolean;
+  handleDialogClose: () => void;
+}
+
+export function NewUserDialog({ isOpen, handleDialogClose }: NewUserDialogProps) {
   const inviteUserState = useSelector(inviteUserSelector);
   const departmentState = useSelector(department);
-  
-  const [hasMounted, setHasMounted] = useState(false);
+  const classData = useSelector(classDateSelector);
   const dispatch = useDispatch<AppDispatch>();
+
+  const [hasMounted, setHasMounted] = useState(false);
 
   const [formData, setFormData] = useState<InviteUserPayload>({
     first_name: "",
     middle_name: "",
     last_name: "",
     email: "",
-    shift: "",
     departmentId: "",
     role: "TEACHER",
+    classIds: [],
   });
 
-  const handleChange = (field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+  const handleChange = (
+    field: string,
+    value: string | string[] | object[]
+  ) => {
+    if (field === "departmentId" && typeof value === "string") {
+      dispatch(fetchClasses({ departmentId: value }));
+    }
+    if (Array.isArray(value)) {
+      setFormData((prev) => ({ ...prev, [field]: [...value] }));
+    } else {
+      setFormData((prev) => ({ ...prev, [field]: value }));
+    }
   };
 
   const handleSave = () => {
-    dispatch(inviteUser(formData)); // Uncomment and use your real Redux action
+    dispatch(inviteUser(formData));
   };
 
   useEffect(() => {
     setHasMounted(true);
     dispatch(fetchDepartments());
-  }, []);
+  }, [dispatch]);
 
   if (!hasMounted) return null;
 
   return (
-    <Drawer>
-      <DrawerTrigger asChild>{children}</DrawerTrigger>
-      <DrawerContent className="p-6 max-w-md ml-auto mr-0 w-full h-fit">
+    <Dialog open={isOpen} onOpenChange={()=> handleDialogClose()}>
+      <DialogContent className="p-6 max-w-md mx-auto w-full">
         <VisuallyHidden>
-          <DrawerTitle>Hidden Title</DrawerTitle>
+          <DialogTitle>Invite New User</DialogTitle>
         </VisuallyHidden>
-        {/* Left side - title & subtitle */}
+
         <div className="mb-5 pr-8 border-r border-gray-200 flex flex-col justify-center">
           <div className="flex items-center gap-2 text-primary mb-2">
             <UserPlus className="w-5 h-5" />
@@ -111,6 +134,8 @@ export function NewUserDrawer({ children }: NewUserDrawerProps) {
             value={formData.email}
             onChange={(e) => handleChange("email", e.target.value)}
           />
+
+          {/* Department Select */}
           {departmentState?.data && (
             <Select
               value={formData.departmentId}
@@ -120,17 +145,67 @@ export function NewUserDrawer({ children }: NewUserDrawerProps) {
                 <SelectValue placeholder="Select Department" />
               </SelectTrigger>
               <SelectContent>
-                {departmentState?.data?.map((d) => (
-                  <SelectItem value={d.id} key={d.name}>{d.name}</SelectItem>
+                {departmentState.data.map((d) => (
+                  <SelectItem value={d.id} key={d.id}>
+                    {d.name}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           )}
+
+          {/* ✅ Classes as Labeled Checkboxes */}
+          {classData?.data && classData.data.length > 0 && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">
+                Assign Classes
+              </label>
+              <div className="border rounded-md p-3 max-h-48 overflow-auto space-y-2 bg-white shadow-sm">
+                {classData.data.map((cls) => {
+                  const isChecked = formData.classIds?.some(
+                    (c) => c.id === cls.id
+                  );
+
+                  return (
+                    <label
+                      key={cls.id}
+                      className="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-2 rounded"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={() => {
+                          const selected = formData.classIds || [];
+                          if (isChecked) {
+                            handleChange(
+                              "classIds",
+                              selected.filter((c) => c.id !== cls.id)
+                            );
+                          } else {
+                            handleChange("classIds", [
+                              ...selected,
+                              { id: cls.id },
+                            ]);
+                          }
+                        }}
+                        className="form-checkbox h-4 w-4 text-primary border-gray-300"
+                      />
+                      <span className="text-sm text-gray-800">
+                        {cls.name}
+                      </span>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           <Input
             placeholder="Shift"
-            value={formData.shift}
+            value={formData.shift || ""}
             onChange={(e) => handleChange("shift", e.target.value)}
           />
+
           <Select
             value={formData.role}
             onValueChange={(value) => handleChange("role", value)}
@@ -140,25 +215,28 @@ export function NewUserDrawer({ children }: NewUserDrawerProps) {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="TEACHER">Teacher</SelectItem>
-              <SelectItem value="STUDENT">Student</SelectItem>
+              {/* Add more roles as needed */}
             </SelectContent>
           </Select>
         </div>
-        <DrawerFooter className="pt-6 flex gap-2">
-          <DrawerClose asChild>
-            <Button variant="outline">Cancel</Button>
-          </DrawerClose>
+
+        <DialogFooter className="pt-6 flex gap-2">
+          <DialogClose asChild>
+            <Button variant="outline" onClick={() => handleDialogClose()}>
+              Cancel
+            </Button>
+          </DialogClose>
           <Button onClick={handleSave} disabled={inviteUserState?.loading}>
             {inviteUserState?.loading ? (
               <>
-                <Loader2Icon className="animate-spin" /> Loading
+                <Loader2Icon className="animate-spin mr-2" /> Loading
               </>
             ) : (
               <>Save</>
             )}
           </Button>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

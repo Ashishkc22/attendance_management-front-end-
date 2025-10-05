@@ -7,6 +7,8 @@ import {
   LogOut,
   LayoutDashboard,
   Users,
+  Pen,
+  PcCase
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -16,19 +18,35 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useSelector } from "react-redux";
 import { userDetailsSelector } from "@/app/features/userManagement/userSelectors";
+import { autRole } from "@/app/features/auth/authSelectors"
 
 const adminNav = [
   {
       label: "User Management",
       href: "/user-management",
       icon: <Users size={20} />,
-    }
+    },
+    {
+      label: "Departments",
+      href: "/departments",
+      icon: <Users size={20} />,
+    },
 ]
 const teacherNav = [
   {
       label: "student",
       href: "/students",
       icon: <Users size={20} />,
+    },
+    {
+      label: "class",
+      href: "/class",
+      icon: <PcCase size={20} />,
+    },
+    {
+      label: "attendance",
+      href: "/attendance",
+      icon: <Pen size={20} />,
     }
 ]
 
@@ -40,6 +58,7 @@ export default function Sidebar() {
     icon: React.ReactNode
   }[]| []>([]);
   const userDetails = useSelector(userDetailsSelector);
+  const userRole = useSelector(autRole);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -64,11 +83,11 @@ export default function Sidebar() {
   };
 
   useEffect(() => {
-    if (userDetails) {
-      if (userDetails?.data.role === "ADMIN") {
+    if (userDetails || userRole) {
+      if (userRole === "ADMIN" || userDetails?.data.role === "ADMIN") {
        setNavItems(adminNav)
       }
-      if(userDetails?.data.role === "TEACHER"){
+      if(userRole === "TEACHER" || userDetails?.data?.role === "TEACHER"){
         setNavItems(teacherNav)
       }
     }
@@ -131,19 +150,20 @@ export default function Sidebar() {
 
       {/* Bottom Buttons */}
       <div className="p-2 space-y-1 border-t dark:border-gray-800">
-        <SidebarItem
+        {/* <SidebarItem
           icon={<Settings size={20} />}
           label="Settings"
           href="/settings"
           collapsed={collapsed}
           active={pathname === "/settings"}
-        />
+        /> */}
         <SidebarItem
           icon={<LogOut size={20} />}
           label="Logout"
           collapsed={collapsed}
           onClick={handleLogout}
           active={false}
+          className="flex items-center p-2 rounded-md transition-colors text-sm font-medium w-full text-white hover:text-black dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-800"
         />
       </div>
     </div>
@@ -157,6 +177,7 @@ function SidebarItem({
   collapsed,
   active,
   onClick,
+  className
 }: {
   icon: React.ReactNode;
   label: string;
@@ -164,8 +185,9 @@ function SidebarItem({
   collapsed: boolean;
   active?: boolean;
   onClick?: () => void;
+  className?:string
 }) {
-  const classNames = `
+  const classNames =className || `
     flex items-center p-2 rounded-md transition-colors text-sm font-medium w-full
     ${
       active

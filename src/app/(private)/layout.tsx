@@ -1,8 +1,5 @@
 import Sidebar from "@/components/Sidebar";
 import RouteProtector from "./RouteProtector";
-import { Inter } from 'next/font/google'
-
-const inter = Inter({ subsets: ['latin'],variable: '--font-inter', })
 
 export const metadata = {
   title: "Dashboard",
